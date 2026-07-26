@@ -234,11 +234,42 @@
   .stop{ scroll-margin-top:110px; }
 
   .stop-card{
+    position:relative;
     background:var(--cream);
     border-radius:20px;
     box-shadow:0 18px 40px rgba(28,19,48,0.22);
     overflow:hidden;
     border:1px solid rgba(255,255,255,0.5);
+  }
+
+  .cancelled-stamp{
+    position:absolute;
+    top:16px;
+    right:18px;
+    z-index:5;
+    padding:4px 14px;
+    border:3px solid #c0392b;
+    border-radius:6px;
+    color:#c0392b;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    transform:rotate(-9deg);
+    background:rgba(255,255,255,0.6);
+    box-shadow:0 2px 6px rgba(192,57,43,0.25);
+    pointer-events:none;
+  }
+  .stop-card.cancelled .stop-title,
+  .stop-card.cancelled .stop-time{
+    text-decoration:line-through;
+    text-decoration-color:#c0392b;
+    text-decoration-thickness:2px;
+    opacity:0.65;
+  }
+  .stop-card.cancelled .stop-icon{
+    opacity:0.55;
   }
 
   .stop-toggle{
@@ -461,7 +492,7 @@
           <span class="stop-icon">🚲</span>
           <span class="stop-heading">
             <span class="stop-title">A Little Stroll</span>
-            <span class="stop-time">6:00 PM · Toronto Music Gardens</span>
+            <span class="stop-time">5:30 PM · Toronto Music Gardens</span>
           </span>
           <span class="stop-chevron">+</span>
         </button>
@@ -481,7 +512,8 @@
 
     <!-- Stop 1 -->
     <section class="stop" id="stop-1" data-stop="1">
-      <article class="stop-card">
+      <article class="stop-card cancelled">
+        <div class="cancelled-stamp">Cancelled</div>
         <button class="stop-toggle" aria-expanded="false" aria-controls="details-1">
           <span class="stop-index">02</span>
           <span class="stop-icon">🧋</span>
@@ -513,7 +545,7 @@
           <span class="stop-icon">🌮</span>
           <span class="stop-heading">
             <span class="stop-title">Dinner & Tacos</span>
-            <span class="stop-time">7:30 PM · El Catrin</span>
+            <span class="stop-time">6:15 PM · El Catrin</span>
           </span>
           <span class="stop-chevron">+</span>
         </button>
@@ -539,7 +571,7 @@
           <span class="stop-icon">🌆</span>
           <span class="stop-heading">
             <span class="stop-title">The View</span>
-            <span class="stop-time">9:00 PM · Polson Pier</span>
+            <span class="stop-time">8:15 PM · Polson Pier</span>
           </span>
           <span class="stop-chevron">+</span>
         </button>
