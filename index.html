@@ -6,157 +6,109 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background: linear-gradient(180deg, #0A0F1F, #1C2337);
-        color: #F2DCA5;
-        overflow-x: hidden;
-    }
+body {
+margin: 0;
+font-family: 'Inter', sans-serif;
+background: linear-gradient(180deg, #0A0F1F, #1C2337);
+color: #F2DCA5;
+overflow-x: hidden;
+}
 
-    h1, h2 {
-        font-family: 'Playfair Display', serif;
-        text-align: center;
-        margin: 0;
-        padding-top: 40px;
-    }
+h1, h2 {
+font-family: 'Playfair Display', serif;
+text-align: center;
+margin: 0;
+padding-top: 80px; /* extra space because bar is fixed */
+}
 
-    h1 {
-        font-size: 42px;
-        color: #F2DCA5;
-    }
+h1 {
+font-size: 42px;
+color: #F2DCA5;
+}
 
-    h2 {
-        font-size: 20px;
-        color: #C7A87A;
-        margin-bottom: 40px;
-    }
+h2 {
+font-size: 20px;
+color: #C7A87A;
+margin-bottom: 40px;
+}
 
-    /* Progress Bar */
-    .progress-container {
-        width: 100%;
-        margin: 30px auto;
-        position: relative;
-        height: 60px;
-    }
+/* Fixed top bar */
+.top-bar {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+background: rgba(10, 15, 31, 0.95);
+backdrop-filter: blur(6px);
+z-index: 1000;
+padding: 10px 0 16px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
 
-    .progress-line {
-        width: 80%;
-        height: 4px;
-        background: #C7A87A55;
-        margin: auto;
-        border-radius: 2px;
-        position: relative;
-    }
+.progress-container {
+width: 100%;
+margin: 0 auto;
+position: relative;
+height: 60px;
+}
 
-    .checkpoint {
-        position: absolute;
-        top: -14px;
-        font-size: 24px;
-        filter: drop-shadow(0 0 6px #F2DCA5);
-    }
+.progress-line {
+width: 80%;
+height: 4px;
+background: #C7A87A55;
+margin: auto;
+border-radius: 2px;
+position: relative;
+}
 
-    #cp1 { left: 10%; }
-    #cp2 { left: 45%; }
-    #cp3 { left: 80%; }
+.checkpoint {
+position: absolute;
+top: -14px;
+font-size: 24px;
+filter: drop-shadow(0 0 6px #F2DCA5);
+}
 
-    .bike {
-        position: absolute;
-        top: -18px;
-        font-size: 26px;
-        transition: left 0.4s ease-out;
-        filter: drop-shadow(0 0 8px #F2DCA5);
-    }
+#cp1 { left: 10%; }
+#cp2 { left: 45%; }
+#cp3 { left: 80%; }
 
-    /* Sections */
-    .section {
-        width: 80%;
-        margin: 60px auto;
-        padding: 20px;
-        background: rgba(255,255,255,0.03);
-        border-left: 2px solid #C7A87A55;
-        border-radius: 6px;
-        backdrop-filter: blur(4px);
-        animation: fadeIn 1.2s ease-out;
-    }
+.bike {
+position: absolute;
+top: -18px;
+font-size: 26px;
+filter: drop-shadow(0 0 8px #F2DCA5);
+transition: left 0.4s ease-out;
+}
 
-    .section h3 {
-        font-family: 'Playfair Display', serif;
-        font-size: 26px;
-        margin-bottom: 10px;
-        color: #F2DCA5;
-    }
+/* Nav buttons */
+.nav-buttons {
+width: 80%;
+margin: 8px auto 0;
+display: flex;
+justify-content: center;
+gap: 10px;
+flex-wrap: wrap;
+}
 
-    .section p {
-        font-size: 16px;
-        line-height: 1.6;
-        color: #F2DCA5CC;
-    }
+.nav-buttons button {
+background: #1C2337;
+color: #F2DCA5;
+border: 1px solid #C7A87A88;
+border-radius: 999px;
+padding: 6px 14px;
+font-size: 14px;
+cursor: pointer;
+transition: background 0.2s, transform 0.1s;
+}
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
+.nav-buttons button:hover {
+background: #2A324A;
+transform: translateY(-1px);
+}
 
-<script>
-    // Move bike as user scrolls
-    document.addEventListener("scroll", () => {
-        const scrollTop = window.scrollY;
-        const docHeight = document.body.scrollHeight - window.innerHeight;
-        const progress = scrollTop / docHeight;
+.nav-buttons button.active {
+background: #C7A87A;
+color: #0A0F1F;
+}
 
-        const bike = document.getElementById("bike");
-        const min = 10;   // left %
-        const max = 80;   // left %
-        const pos = min + (max - min) * progress;
-
-        bike.style.left = pos + "%";
-    });
-</script>
-
-</head>
-<body>
-
-<h1>Toronto Night Out</h1>
-<h2>A night out in Toronto, just us</h2>
-
-<div class="progress-container">
-    <div class="progress-line"></div>
-    <div id="cp1" class="checkpoint">🍹</div>
-    <div id="cp2" class="checkpoint">🌮</div>
-    <div id="cp3" class="checkpoint">🌅</div>
-    <div id="bike" class="bike">🚲</div>
-</div>
-
-<div class="section">
-    <h3>Toronto Music Gardens</h3>
-    <p>A quiet stroll through the Music Gardens as the evening settles in.  
-       We find our bikes and begin the night ride.</p>
-</div>
-
-<div class="section">
-    <h3>Bubble Baby</h3>
-    <p>A sweet bubble tea stop — warm lights, soft glow, and a cozy pause in the night.</p>
-</div>
-
-<div class="section">
-    <h3>El Catrin · 7:00 PM</h3>
-    <p>Dinner and tacos in the Distillery District.  
-       Candlelit energy, warm atmosphere, and the midpoint of our night.</p>
-</div>
-
-<div class="section">
-    <h3>Polson Pier Viewpoint</h3>
-    <p>The skyline moment.  
-       Toronto glowing across the water — calm, romantic, and still.</p>
-</div>
-
-<div class="section">
-    <h3>Epilogue</h3>
-    <p>A gentle ride back toward downtown,  
-       or a cozy Uber home if the night runs late.</p>
-</div>
-
-</body>
-</html>
+/* Sections
