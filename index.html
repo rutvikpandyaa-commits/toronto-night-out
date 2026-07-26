@@ -2,283 +2,689 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Toronto Night Out</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>An Evening in Toronto 🚲</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Outfit:wght@300;400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 <style>
-body {
-margin: 0;
-font-family: 'Inter', sans-serif;
-background: linear-gradient(180deg, #0A0F1F, #1C2337);
-color: #F2DCA5;
-overflow-x: hidden;
-}
+  :root{
+    --ink:#2b1f2e;
+    --cream:#fbf1e7;
+    --coral:#e8785f;
+    --gold:#eab464;
+    --dusk:#4a3560;
+    --night:#1c1330;
+    --blush:#f3cdc4;
+    --line: rgba(43,31,46,0.12);
+  }
 
-h1, h2 {
-font-family: 'Playfair Display', serif;
-text-align: center;
-margin: 0;
-padding-top: 80px; /* extra space because bar is fixed */
-}
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Outfit', sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
 
-h1 {
-font-size: 42px;
-color: #F2DCA5;
-}
+  /* -------- animated sky background -------- */
+  #sky{
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    background:linear-gradient(180deg, #f4b860 0%, #e8785f 60%, #d6664f 100%);
+    transition:background 0.05s linear;
+  }
+  #sky::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(ellipse at 50% 15%, rgba(255,255,255,0.18), transparent 55%);
+    pointer-events:none;
+  }
 
-h2 {
-font-size: 20px;
-color: #C7A87A;
-margin-bottom: 40px;
-}
+  /* -------- fixed progress bar -------- */
+  .progress-bar{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:100;
+    padding:18px 24px 34px;
+    background:rgba(251,241,231,0.55);
+    backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid rgba(255,255,255,0.4);
+  }
+  .progress-track{
+    position:relative;
+    max-width:640px;
+    margin:0 auto;
+    height:6px;
+    background:rgba(43,31,46,0.14);
+    border-radius:99px;
+  }
+  .progress-track::before{
+    /* road dashes */
+    content:"";
+    position:absolute;
+    top:50%; left:0; right:0;
+    height:2px;
+    transform:translateY(-50%);
+    background-image:repeating-linear-gradient(90deg, rgba(255,255,255,0.7) 0 8px, transparent 8px 16px);
+    opacity:0.55;
+    pointer-events:none;
+  }
+  .progress-fill{
+    position:absolute;
+    top:0; left:0;
+    height:100%;
+    width:0%;
+    border-radius:99px;
+    background:linear-gradient(90deg, var(--gold), var(--coral));
+    transition:width 0.05s linear;
+  }
+  .checkpoint{
+    position:absolute;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:30px; height:30px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    background:var(--cream);
+    border:2px solid rgba(43,31,46,0.16);
+    font-size:14px;
+    transition:border-color .3s ease, box-shadow .3s ease, transform .3s ease;
+  }
+  .checkpoint.reached{
+    border-color:var(--coral);
+    box-shadow:0 0 0 4px rgba(232,120,95,0.18);
+  }
+  .checkpoint.current{
+    transform:translate(-50%,-50%) scale(1.18);
+    box-shadow:0 0 0 6px rgba(234,180,100,0.28);
+  }
+  .checkpoint-label{
+    position:absolute;
+    top:130%;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:0.65;
+    white-space:nowrap;
+    display:none;
+  }
+  .checkpoint[data-stop="0"] .checkpoint-label{
+    left:0;
+    transform:translateX(0);
+  }
+  .checkpoint[data-stop="3"] .checkpoint-label{
+    left:auto;
+    right:0;
+    transform:translateX(0);
+  }
+  .bike-marker{
+    position:absolute;
+    top:50%;
+    left:0%;
+    transform:translate(-50%,-58%);
+    display:flex;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,0.25));
+    transition:left 0.05s linear, opacity 0.2s ease;
+    animation:pedal 1.1s ease-in-out infinite;
+  }
+  @keyframes pedal{
+    0%,100%{ transform:translate(-50%,-58%); }
+    50%{ transform:translate(-50%,-64%); }
+  }
 
-/* Fixed top bar */
-.top-bar {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-background: rgba(10, 15, 31, 0.95);
-backdrop-filter: blur(6px);
-z-index: 1000;
-padding: 10px 0 16px;
-box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
+  @media (min-width:640px){
+    .checkpoint-label{ display:block; }
+  }
 
-.progress-container {
-width: 100%;
-margin: 0 auto;
-position: relative;
-height: 60px;
-}
+  /* -------- layout -------- */
+  main{ position:relative; z-index:1; }
 
-.progress-line {
-width: 80%;
-height: 4px;
-background: #C7A87A55;
-margin: auto;
-border-radius: 2px;
-position: relative;
-}
+  .hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:120px 24px 80px;
+    color:#fff;
+  }
+  .hero .eyebrow{
+    font-family:'Caveat', cursive;
+    font-size:26px;
+    color:var(--cream);
+    opacity:0.9;
+    margin-bottom:6px;
+  }
+  .hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(2.4rem, 6vw, 4.4rem);
+    line-height:1.05;
+    margin:0 0 18px;
+    text-shadow:0 8px 30px rgba(28,19,48,0.25);
+  }
+  .hero p.sub{
+    font-size:17px;
+    max-width:420px;
+    opacity:0.9;
+    margin:0 0 46px;
+    line-height:1.6;
+  }
+  .scroll-cue{
+    font-size:13px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    opacity:0.8;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  .synopsis{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin:0 0 40px;
+  }
+  .synopsis-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:9px 18px;
+    border-radius:99px;
+    background:rgba(255,255,255,0.16);
+    border:1px solid rgba(255,255,255,0.35);
+    backdrop-filter:blur(6px);
+    font-size:14px;
+    letter-spacing:0.01em;
+  }
+  .synopsis-chip em{
+    font-style:normal;
+    font-family:'Fraunces', serif;
+  }
+  .scroll-cue span{
+    display:inline-block;
+    animation:bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(8px); }
+  }
 
-.checkpoint {
-position: absolute;
-top: -14px;
-font-size: 24px;
-filter: drop-shadow(0 0 6px #F2DCA5);
-}
+  .itinerary{
+    max-width:640px;
+    margin:0 auto;
+    padding:40px 20px 40px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
 
-#cp1 { left: 10%; }
-#cp2 { left: 45%; }
-#cp3 { left: 80%; }
+  .stop{ scroll-margin-top:110px; }
 
-.bike {
-position: absolute;
-top: -18px;
-font-size: 26px;
-filter: drop-shadow(0 0 8px #F2DCA5);
-transition: left 0.4s ease-out;
-}
+  .stop-card{
+    background:var(--cream);
+    border-radius:20px;
+    box-shadow:0 18px 40px rgba(28,19,48,0.22);
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,0.5);
+  }
 
-/* Nav buttons */
-.nav-buttons {
-width: 80%;
-margin: 8px auto 0;
-display: flex;
-justify-content: center;
-gap: 10px;
-flex-wrap: wrap;
-}
+  .stop-toggle{
+    all:unset;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:20px 22px;
+    cursor:pointer;
+    width:100%;
+  }
+  .stop-index{
+    font-family:'Fraunces', serif;
+    font-size:13px;
+    color:var(--coral);
+    opacity:0.7;
+    letter-spacing:0.06em;
+    min-width:22px;
+  }
+  .stop-icon{
+    font-size:26px;
+    line-height:1;
+    flex-shrink:0;
+  }
+  .stop-heading{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    flex:1;
+    min-width:0;
+  }
+  .stop-title{
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    font-weight:500;
+  }
+  .stop-time{
+    font-size:13px;
+    color:var(--ink);
+    opacity:0.6;
+  }
+  .stop-chevron{
+    font-family:'Outfit', sans-serif;
+    font-size:22px;
+    font-weight:300;
+    color:var(--coral);
+    transition:transform .35s ease;
+    flex-shrink:0;
+  }
+  .stop-card.open .stop-chevron{ transform:rotate(45deg); }
 
-.nav-buttons button {
-background: #1C2337;
-color: #F2DCA5;
-border: 1px solid #C7A87A88;
-border-radius: 999px;
-padding: 6px 14px;
-font-size: 14px;
-cursor: pointer;
-transition: background 0.2s, transform 0.1s;
-}
+  .stop-details{
+    display:grid;
+    grid-template-rows:0fr;
+    transition:grid-template-rows .5s ease;
+  }
+  .stop-card.open .stop-details{ grid-template-rows:1fr; }
+  .stop-details-inner{ overflow:hidden; }
 
-.nav-buttons button:hover {
-background: #2A324A;
-transform: translateY(-1px);
-}
+  .stop-details-content{
+    display:flex;
+    gap:18px;
+    padding:0 22px 26px;
+    align-items:flex-start;
+  }
+  .stop-medallion{
+    flex-shrink:0;
+    width:78px; height:78px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:34px;
+    background:radial-gradient(circle at 35% 30%, var(--blush), var(--coral) 75%);
+    box-shadow:inset 0 2px 6px rgba(255,255,255,0.5), 0 6px 16px rgba(232,120,95,0.35);
+    border:2px dashed rgba(255,255,255,0.6);
+  }
+  .stop-copy{ flex:1; padding-top:4px; }
+  .stop-location{
+    font-size:13px;
+    font-weight:500;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--coral);
+    margin:0 0 8px;
+  }
+  .stop-location a{
+    color:inherit;
+    text-decoration:none;
+    border-bottom:1px dashed rgba(232,120,95,0.5);
+    transition:border-color .2s ease, opacity .2s ease;
+  }
+  .stop-location a:hover,
+  .stop-location a:focus-visible{
+    border-color:var(--coral);
+    opacity:0.8;
+  }
+  .stop-desc{
+    font-size:15px;
+    line-height:1.6;
+    margin:0;
+    color:var(--ink);
+  }
 
-.nav-buttons button.active {
-background: #C7A87A;
-color: #0A0F1F;
-}
+  /* epilogue */
+  .epilogue{
+    border:2px dashed rgba(43,31,46,0.25);
+    background:rgba(251,241,231,0.55);
+    border-radius:20px;
+    padding:26px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .epilogue .stop-index{ display:block; margin-bottom:2px; }
+  .epilogue-title{
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    font-weight:500;
+  }
+  .epilogue-desc{
+    font-size:15px;
+    line-height:1.6;
+    margin:0 0 6px;
+  }
+  .epilogue-options{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .epilogue-option{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border-radius:99px;
+    background:var(--cream);
+    font-size:14px;
+    box-shadow:0 4px 10px rgba(28,19,48,0.12);
+  }
 
-/* Sections */
-.section {
-width: 80%;
-margin: 40px auto;
-padding: 20px;
-background: rgba(255,255,255,0.03);
-border-left: 2px solid #C7A87A55;
-border-radius: 6px;
-backdrop-filter: blur(4px);
-animation: fadeIn 1.2s ease-out;
-}
+  footer{
+    text-align:center;
+    padding:60px 24px 90px;
+    color:var(--cream);
+    font-family:'Caveat', cursive;
+    font-size:22px;
+    opacity:0.85;
+  }
 
-.section h3 {
-font-family: 'Playfair Display', serif;
-font-size: 26px;
-margin-bottom: 10px;
-color: #F2DCA5;
-display: flex;
-align-items: center;
-gap: 8px;
-}
-
-.pin {
-font-size: 22px;
-}
-
-.maps-link {
-display: inline-block;
-margin-top: 6px;
-font-size: 14px;
-color: #F2DCA5;
-text-decoration: none;
-border-bottom: 1px dashed #C7A87A;
-}
-
-.maps-link:hover {
-color: #FFFFFF;
-border-bottom-style: solid;
-}
-
-.section p {
-font-size: 16px;
-line-height: 1.6;
-color: #F2DCA5CC;
-}
-
-.place-image {
-width: 100%;
-max-height: 260px;
-object-fit: cover;
-border-radius: 8px;
-margin-top: 12px;
-border: 1px solid #C7A87A55;
-}
-
-@keyframes fadeIn {
-from { opacity: 0; transform: translateY(20px); }
-to { opacity: 1; transform: translateY(0); }
-}
+  @media (prefers-reduced-motion: reduce){
+    .bike-marker, .scroll-cue span{ animation:none; }
+    html{ scroll-behavior:auto; }
+  }
 </style>
-
-<script>
-// Button-based navigation + bike movement
-document.addEventListener("DOMContentLoaded", () => {
-const bike = document.getElementById("bike");
-const buttons = document.querySelectorAll(".nav-buttons button");
-
-const positions = {
-"music-gardens": 10,
-"bubble-baby": 30,
-"el-catrin": 55,
-"polson-pier": 80,
-"epilogue": 90
-};
-
-buttons.forEach(btn => {
-btn.addEventListener("click", () => {
-const targetId = btn.getAttribute("data-target");
-const section = document.getElementById(targetId);
-
-// Move bike
-const pos = positions[targetId] || 10;
-bike.style.left = pos + "%";
-
-// Active button styling
-buttons.forEach(b => b.classList.remove("active"));
-btn.classList.add("active");
-
-// Smooth scroll to section
-const y = section.getBoundingClientRect().top + window.scrollY - 90; // offset for fixed bar
-window.scrollTo({ top: y, behavior: "smooth" });
-});
-});
-
-// Set initial position
-bike.style.left = positions["music-gardens"] + "%";
-buttons[0].classList.add("active");
-});
-</script>
-
 </head>
 <body>
 
-<div class="top-bar">
-<div class="progress-container">
-<div class="progress-line"></div>
-<div id="cp1" class="checkpoint">🍹</div>
-<div id="cp2" class="checkpoint">🌮</div>
-<div id="cp3" class="checkpoint">🌅</div>
-<div id="bike" class="bike">🚲</div>
-</div>
-<div class="nav-buttons">
-<button data-target="music-gardens">Music Gardens</button>
-<button data-target="bubble-baby">Bubble Baby</button>
-<button data-target="el-catrin">El Catrin</button>
-<button data-target="polson-pier">Polson Pier</button>
-<button data-target="epilogue">Epilogue</button>
-</div>
+<div id="sky"></div>
+
+<!-- ============ FIXED PROGRESS BAR ============ -->
+<div class="progress-bar">
+  <div class="progress-track" id="progressTrack">
+    <div class="progress-fill" id="progressFill"></div>
+
+    <div class="checkpoint" data-stop="0">
+      <span>🎵</span>
+      <span class="checkpoint-label">Music Garden</span>
+    </div>
+    <div class="checkpoint" data-stop="1">
+      <span>🧋</span>
+      <span class="checkpoint-label">Bubble Tea</span>
+    </div>
+    <div class="checkpoint" data-stop="2">
+      <span>🌮</span>
+      <span class="checkpoint-label">El Catrin</span>
+    </div>
+    <div class="checkpoint" data-stop="3">
+      <span>🌆</span>
+      <span class="checkpoint-label">Polson Pier</span>
+    </div>
+
+    <div class="bike-marker" id="bikeMarker">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bikeGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#eab464"/>
+            <stop offset="1" stop-color="#e8785f"/>
+          </linearGradient>
+        </defs>
+        <circle cx="5.5" cy="17.5" r="3.5" stroke="url(#bikeGrad)" stroke-width="1.8"/>
+        <circle cx="18.5" cy="17.5" r="3.5" stroke="url(#bikeGrad)" stroke-width="1.8"/>
+        <path d="M5.5 17.5 12 8l3 4.5M12 8h3M12 8l-1.5-2.5M18.5 17.5 15 12.5h-4.2" stroke="url(#bikeGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13.2 5.5h2" stroke="url(#bikeGrad)" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
 </div>
 
-<h1>Toronto Night Out</h1>
-<h2>A night out in Toronto, just us</h2>
+<main>
 
-<div id="music-gardens" class="section">
-<h3><span class="pin">📍</span> Toronto Music Garden</h3>
-<a class="maps-link" href="https://maps.app.goo.gl/3pLkq3pQFq7uQyqF8" target="_blank">
-Open in Google Maps
-</a>
-<p>A quiet stroll through the Music Garden as the evening settles in.
-We find our bikes and begin the night ride.</p>
-<img class="place-image" src="https://images.pexels.com/photos/462162/pexels-photo-462162.jpeg" alt="Toronto Music Garden at dusk">
-</div>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="eyebrow">for you 🚲</div>
+    <h1>a little evening,<br>mapped out</h1>
+    <p class="sub">One route through the city — a stroll, a drink, dinner, and a view. Scroll to follow the ride.</p>
+    <div class="synopsis">
+      <span class="synopsis-chip">📅 July 31st, 2026</span>
+      <span class="synopsis-chip">🎡 Invite for: <em>🧚‍♀️</em></span>
+    </div>
+    <div class="scroll-cue"><span>↓</span> scroll to begin</div>
+  </section>
 
-<div id="bubble-baby" class="section">
-<h3><span class="pin">📍</span> Bubble Baby</h3>
-<a class="maps-link" href="https://maps.app.goo.gl/2LwL4bqLw7tqZyqE9" target="_blank">
-Open in Google Maps
-</a>
-<p>A sweet bubble tea stop — warm lights, soft glow, and a cozy pause in the night.</p>
-<img class="place-image" src="https://images.pexels.com/photos/3731474/pexels-photo-3731474.jpeg" alt="Bubble tea shop at night">
-</div>
+  <!-- ============ ITINERARY ============ -->
+  <div class="itinerary">
 
-<div id="el-catrin" class="section">
-<h3><span class="pin">📍</span> El Catrin · 7:00 PM</h3>
-<a class="maps-link" href="https://maps.app.goo.gl/7pVtq3LwFq9uTyqJ7" target="_blank">
-Open in Google Maps
-</a>
-<p>Dinner and tacos in the Distillery District.
-Candlelit energy, warm atmosphere, and the midpoint of our night.</p>
-<img class="place-image" src="https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg" alt="Distillery District restaurant at night">
-</div>
+    <!-- Stop 0 -->
+    <section class="stop" id="stop-0" data-stop="0">
+      <article class="stop-card">
+        <button class="stop-toggle" aria-expanded="false" aria-controls="details-0">
+          <span class="stop-index">01</span>
+          <span class="stop-icon">🚲</span>
+          <span class="stop-heading">
+            <span class="stop-title">A Little Stroll</span>
+            <span class="stop-time">6:00 PM · Toronto Music Gardens</span>
+          </span>
+          <span class="stop-chevron">+</span>
+        </button>
+        <div class="stop-details" id="details-0">
+          <div class="stop-details-inner">
+            <div class="stop-details-content">
+              <div class="stop-medallion">🌳</div>
+              <div class="stop-copy">
+                <p class="stop-location"><a href="https://www.google.com/maps/search/?api=1&query=479+Queens+Quay+W%2C+Toronto%2C+ON+M5V+3M8" target="_blank" rel="noopener">Toronto Music Gardens — 479 Queens Quay W, Toronto, ON M5V 3M8</a></p>
+                <p class="stop-desc">We'll start with a little stroll along the Music Gardens — break the ice before we fall off our bikes and break our legs. Then we'll find some city bikes.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
 
-<div id="polson-pier" class="section">
-<h3><span class="pin">📍</span> Polson Pier Viewpoint</h3>
-<a class="maps-link" href="https://maps.app.goo.gl/6qVtq4PwFq8uRyqK6" target="_blank">
-Open in Google Maps
-</a>
-<p>The skyline moment.
-Toronto glowing across the water — calm, romantic, and still.</p>
-<img class="place-image" src="https://images.pexels.com/photos/374870/pexels-photo-374870.jpeg" alt="Toronto skyline from the waterfront at night">
-</div>
+    <!-- Stop 1 -->
+    <section class="stop" id="stop-1" data-stop="1">
+      <article class="stop-card">
+        <button class="stop-toggle" aria-expanded="false" aria-controls="details-1">
+          <span class="stop-index">02</span>
+          <span class="stop-icon">🧋</span>
+          <span class="stop-heading">
+            <span class="stop-title">Bubble Tea Stop</span>
+            <span class="stop-time">6:45 PM · Bubble Baby</span>
+          </span>
+          <span class="stop-chevron">+</span>
+        </button>
+        <div class="stop-details" id="details-1">
+          <div class="stop-details-inner">
+            <div class="stop-details-content">
+              <div class="stop-medallion">🧋</div>
+              <div class="stop-copy">
+                <p class="stop-location"><a href="https://www.google.com/maps/search/?api=1&query=258+Queens+Quay+W%2C+Unit+6%2C+Toronto%2C+ON+M5J+1B5" target="_blank" rel="noopener">Bubble Baby — 258 Queens Quay W, Unit 6, Toronto, ON M5J 1B5</a></p>
+                <p class="stop-desc">A quick ride over to Bubble Baby for a bubble tea.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
 
-<div id="epilogue" class="section">
-<h3><span class="pin">📍</span> Epilogue</h3>
-<p>A gentle ride back toward downtown,
-or a cozy Uber home if the night runs late.</p>
-<img class="place-image" src="https://images.pexels.com/photos/1449791/pexels-photo-1449791.jpeg" alt="City street at night, soft lights">
-</div>
+    <!-- Stop 2 -->
+    <section class="stop" id="stop-2" data-stop="2">
+      <article class="stop-card">
+        <button class="stop-toggle" aria-expanded="false" aria-controls="details-2">
+          <span class="stop-index">03</span>
+          <span class="stop-icon">🌮</span>
+          <span class="stop-heading">
+            <span class="stop-title">Dinner & Tacos</span>
+            <span class="stop-time">7:30 PM · El Catrin</span>
+          </span>
+          <span class="stop-chevron">+</span>
+        </button>
+        <div class="stop-details" id="details-2">
+          <div class="stop-details-inner">
+            <div class="stop-details-content">
+              <div class="stop-medallion">🌮</div>
+              <div class="stop-copy">
+                <p class="stop-location"><a href="https://www.google.com/maps/search/?api=1&query=18+Tank+House+Lane%2C+Toronto%2C+ON+M5A+3C4" target="_blank" rel="noopener">El Catrin — 18 Tank House Lane, Toronto, ON M5A 3C4</a></p>
+                <p class="stop-desc">Dinner at El Catrin in the Distillery District — tacos, good light, and patio if the weather's kind to us.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Stop 3 -->
+    <section class="stop" id="stop-3" data-stop="3">
+      <article class="stop-card">
+        <button class="stop-toggle" aria-expanded="false" aria-controls="details-3">
+          <span class="stop-index">04</span>
+          <span class="stop-icon">🌆</span>
+          <span class="stop-heading">
+            <span class="stop-title">The View</span>
+            <span class="stop-time">9:00 PM · Polson Pier</span>
+          </span>
+          <span class="stop-chevron">+</span>
+        </button>
+        <div class="stop-details" id="details-3">
+          <div class="stop-details-inner">
+            <div class="stop-details-content">
+              <div class="stop-medallion">🌇</div>
+              <div class="stop-copy">
+                <p class="stop-location"><a href="https://www.google.com/maps/search/?api=1&query=11+Polson+St%2C+Toronto%2C+ON+M5A+1A4" target="_blank" rel="noopener">Polson Pier — 11 Polson St, Toronto, ON M5A 1A4</a></p>
+                <p class="stop-desc">Last stop — the skyline from Polson Pier.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Epilogue -->
+    <section class="epilogue">
+      <span class="stop-index">EPILOGUE · OPTIONAL</span>
+      <div class="epilogue-title">Getting Back</div>
+      <p class="epilogue-desc">However the night's feeling by then — an easy ride back downtown along the water, or if it's gotten late, an Uber's on me.</p>
+      <div class="epilogue-options">
+        <span class="epilogue-option">🚲 Bike back downtown</span>
+        <span class="epilogue-option">🚗 Uber, my treat</span>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>see you soon 💛</footer>
+
+</main>
+
+<script>
+(function(){
+  const track = document.getElementById('progressTrack');
+  const fill = document.getElementById('progressFill');
+  const bike = document.getElementById('bikeMarker');
+  const checkpoints = Array.from(document.querySelectorAll('.checkpoint'));
+  const stops = checkpoints.map(cp => document.getElementById('stop-' + cp.dataset.stop));
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // sky gradient keyframes: [top color, bottom color] at fraction 0, 0.5, 1
+  const skyStops = [
+    { top:[244,184,96],  bottom:[232,120,95] },
+    { top:[122,90,140],  bottom:[74,53,96]   },
+    { top:[28,19,48],    bottom:[18,11,34]   }
+  ];
+
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function lerpColor(c1,c2,t){
+    return [
+      Math.round(lerp(c1[0],c2[0],t)),
+      Math.round(lerp(c1[1],c2[1],t)),
+      Math.round(lerp(c1[2],c2[2],t))
+    ];
+  }
+  function rgb(c){ return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')'; }
+
+  function updateSky(fraction){
+    let t, a, b;
+    if(fraction <= 0.5){
+      t = fraction / 0.5;
+      a = skyStops[0]; b = skyStops[1];
+    } else {
+      t = (fraction - 0.5) / 0.5;
+      a = skyStops[1]; b = skyStops[2];
+    }
+    const top = lerpColor(a.top, b.top, t);
+    const bottom = lerpColor(a.bottom, b.bottom, t);
+    document.getElementById('sky').style.background =
+      'linear-gradient(180deg,' + rgb(top) + ' 0%,' + rgb(bottom) + ' 100%)';
+  }
+
+  function layoutCheckpoints(){
+    // evenly spaced along the track, with a little padding from each end
+    const start = 4, end = 96;
+    const step = (end - start) / (checkpoints.length - 1);
+    checkpoints.forEach((cp, i) => {
+      const pct = start + step * i;
+      cp.style.left = pct + '%';
+      cp.dataset.pct = pct;
+    });
+  }
+
+  let ticking = false;
+  function onScroll(){
+    if(ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const fraction = maxScroll > 0 ? Math.max(0, Math.min(1, window.scrollY / maxScroll)) : 0;
+      const trackStart = 4, trackEnd = 96;
+      const pct = trackStart + fraction * (trackEnd - trackStart);
+
+      fill.style.width = pct + '%';
+      bike.style.left = pct + '%';
+
+      const nearCheckpoint = checkpoints.some(cp => {
+        const cpPct = parseFloat(cp.dataset.pct || '0');
+        return Math.abs(pct - cpPct) < 3;
+      });
+      bike.style.opacity = nearCheckpoint ? '0' : '1';
+
+      checkpoints.forEach(cp => {
+        const cpPct = parseFloat(cp.dataset.pct || '0');
+        cp.classList.toggle('reached', pct >= cpPct - 1);
+      });
+
+      if(!reduceMotion) updateSky(fraction);
+      else document.getElementById('sky').style.background =
+        'linear-gradient(180deg, rgb(122,90,140), rgb(74,53,96))';
+
+      ticking = false;
+    });
+  }
+
+  // highlight the current section's checkpoint using IntersectionObserver
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const idx = stops.indexOf(entry.target);
+      if(idx === -1) return;
+      checkpoints[idx].classList.toggle('current', entry.isIntersecting);
+    });
+  }, { rootMargin: '-40% 0px -40% 0px' });
+  stops.forEach(el => el && observer.observe(el));
+
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', () => { layoutCheckpoints(); onScroll(); });
+  window.addEventListener('load', () => { layoutCheckpoints(); onScroll(); });
+  layoutCheckpoints();
+  onScroll();
+
+  // card expand/collapse
+  document.querySelectorAll('.stop-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.stop-card');
+      const isOpen = card.classList.toggle('open');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
