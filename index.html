@@ -111,4 +111,174 @@ background: #C7A87A;
 color: #0A0F1F;
 }
 
-/* Sections
+/* Sections */
+.section {
+width: 80%;
+margin: 40px auto;
+padding: 20px;
+background: rgba(255,255,255,0.03);
+border-left: 2px solid #C7A87A55;
+border-radius: 6px;
+backdrop-filter: blur(4px);
+animation: fadeIn 1.2s ease-out;
+}
+
+.section h3 {
+font-family: 'Playfair Display', serif;
+font-size: 26px;
+margin-bottom: 10px;
+color: #F2DCA5;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.pin {
+font-size: 22px;
+}
+
+.maps-link {
+display: inline-block;
+margin-top: 6px;
+font-size: 14px;
+color: #F2DCA5;
+text-decoration: none;
+border-bottom: 1px dashed #C7A87A;
+}
+
+.maps-link:hover {
+color: #FFFFFF;
+border-bottom-style: solid;
+}
+
+.section p {
+font-size: 16px;
+line-height: 1.6;
+color: #F2DCA5CC;
+}
+
+.place-image {
+width: 100%;
+max-height: 260px;
+object-fit: cover;
+border-radius: 8px;
+margin-top: 12px;
+border: 1px solid #C7A87A55;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script>
+// Button-based navigation + bike movement
+document.addEventListener("DOMContentLoaded", () => {
+const bike = document.getElementById("bike");
+const buttons = document.querySelectorAll(".nav-buttons button");
+
+const positions = {
+"music-gardens": 10,
+"bubble-baby": 30,
+"el-catrin": 55,
+"polson-pier": 80,
+"epilogue": 90
+};
+
+buttons.forEach(btn => {
+btn.addEventListener("click", () => {
+const targetId = btn.getAttribute("data-target");
+const section = document.getElementById(targetId);
+
+// Move bike
+const pos = positions[targetId] || 10;
+bike.style.left = pos + "%";
+
+// Active button styling
+buttons.forEach(b => b.classList.remove("active"));
+btn.classList.add("active");
+
+// Smooth scroll to section
+const y = section.getBoundingClientRect().top + window.scrollY - 90; // offset for fixed bar
+window.scrollTo({ top: y, behavior: "smooth" });
+});
+});
+
+// Set initial position
+bike.style.left = positions["music-gardens"] + "%";
+buttons[0].classList.add("active");
+});
+</script>
+
+</head>
+<body>
+
+<div class="top-bar">
+<div class="progress-container">
+<div class="progress-line"></div>
+<div id="cp1" class="checkpoint">🍹</div>
+<div id="cp2" class="checkpoint">🌮</div>
+<div id="cp3" class="checkpoint">🌅</div>
+<div id="bike" class="bike">🚲</div>
+</div>
+<div class="nav-buttons">
+<button data-target="music-gardens">Music Gardens</button>
+<button data-target="bubble-baby">Bubble Baby</button>
+<button data-target="el-catrin">El Catrin</button>
+<button data-target="polson-pier">Polson Pier</button>
+<button data-target="epilogue">Epilogue</button>
+</div>
+</div>
+
+<h1>Toronto Night Out</h1>
+<h2>A night out in Toronto, just us</h2>
+
+<div id="music-gardens" class="section">
+<h3><span class="pin">📍</span> Toronto Music Garden</h3>
+<a class="maps-link" href="https://maps.app.goo.gl/3pLkq3pQFq7uQyqF8" target="_blank">
+Open in Google Maps
+</a>
+<p>A quiet stroll through the Music Garden as the evening settles in.
+We find our bikes and begin the night ride.</p>
+<img class="place-image" src="https://images.pexels.com/photos/462162/pexels-photo-462162.jpeg" alt="Toronto Music Garden at dusk">
+</div>
+
+<div id="bubble-baby" class="section">
+<h3><span class="pin">📍</span> Bubble Baby</h3>
+<a class="maps-link" href="https://maps.app.goo.gl/2LwL4bqLw7tqZyqE9" target="_blank">
+Open in Google Maps
+</a>
+<p>A sweet bubble tea stop — warm lights, soft glow, and a cozy pause in the night.</p>
+<img class="place-image" src="https://images.pexels.com/photos/3731474/pexels-photo-3731474.jpeg" alt="Bubble tea shop at night">
+</div>
+
+<div id="el-catrin" class="section">
+<h3><span class="pin">📍</span> El Catrin · 7:00 PM</h3>
+<a class="maps-link" href="https://maps.app.goo.gl/7pVtq3LwFq9uTyqJ7" target="_blank">
+Open in Google Maps
+</a>
+<p>Dinner and tacos in the Distillery District.
+Candlelit energy, warm atmosphere, and the midpoint of our night.</p>
+<img class="place-image" src="https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg" alt="Distillery District restaurant at night">
+</div>
+
+<div id="polson-pier" class="section">
+<h3><span class="pin">📍</span> Polson Pier Viewpoint</h3>
+<a class="maps-link" href="https://maps.app.goo.gl/6qVtq4PwFq8uRyqK6" target="_blank">
+Open in Google Maps
+</a>
+<p>The skyline moment.
+Toronto glowing across the water — calm, romantic, and still.</p>
+<img class="place-image" src="https://images.pexels.com/photos/374870/pexels-photo-374870.jpeg" alt="Toronto skyline from the waterfront at night">
+</div>
+
+<div id="epilogue" class="section">
+<h3><span class="pin">📍</span> Epilogue</h3>
+<p>A gentle ride back toward downtown,
+or a cozy Uber home if the night runs late.</p>
+<img class="place-image" src="https://images.pexels.com/photos/1449791/pexels-photo-1449791.jpeg" alt="City street at night, soft lights">
+</div>
+
+</body>
+</html>
